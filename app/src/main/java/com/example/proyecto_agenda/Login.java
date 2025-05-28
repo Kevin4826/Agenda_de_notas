@@ -15,111 +15,132 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class Login extends AppCompatActivity {
 
-    EditText CorreoLogin, PassLogin;
-    Button Btn_Logeo;
-    TextView UsuarioNuevoTXT;
+    private EditText CorreoLogin, PassLogin;
+    private Button Btn_Logeo;
+    private TextView UsuarioNuevoTXT;
+    private ProgressDialog progressDialog;
 
-    ProgressDialog progressDialog;
-    FirebaseAuth firebaseAuth;
-//Validar datos
-    String correo = "", password = "";
+    private AuthService authService;
+    private LoginValidator validator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login2);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Login");
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
+        setupActionBar();
+        initViews();
 
+        validator = new LoginValidator();
+        authService = new FirebaseAuthService();
+
+        Btn_Logeo.setOnClickListener(v -> validarDatos());
+        UsuarioNuevoTXT.setOnClickListener(v -> startActivity(new Intent(Login.this, Registro.class)));
+    }
+
+    private void setupActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle("Login");
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
+    }
+
+    private void initViews() {
         CorreoLogin = findViewById(R.id.CorreoLogin);
         PassLogin = findViewById(R.id.PassLogin);
         Btn_Logeo = findViewById(R.id.Btn_Logeo);
         UsuarioNuevoTXT = findViewById(R.id.UsuarioNuevoTXT);
 
-        firebaseAuth = FirebaseAuth.getInstance();
-
-        progressDialog = new ProgressDialog(Login.this);
+        progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Espere por favor");
         progressDialog.setCanceledOnTouchOutside(false);
-
-        Btn_Logeo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ValidarDatos();
-            }
-        });
-        UsuarioNuevoTXT.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Login.this, Registro.class));
-            }
-        });
     }
 
-    private void ValidarDatos() {
+    private void validarDatos() {
+        String email = CorreoLogin.getText().toString();
+        String password = PassLogin.getText().toString();
 
-    correo = CorreoLogin.getText().toString();
-    password = PassLogin.getText().toString();
-
-    if (!Patterns.EMAIL_ADDRESS.matcher(correo).matches()){
-        Toast.makeText(this, "Correo invalido", Toast.LENGTH_SHORT).show();
+        if (!validator.isValidEmail(email)) {
+            Toast.makeText(this, "Correo inválido", Toast.LENGTH_SHORT).show();
+        } else if (!validator.isValidPassword(password)) {
+            Toast.makeText(this, "Ingrese contraseña", Toast.LENGTH_SHORT).show();
+        } else {
+            iniciarSesion(email, password);
+        }
     }
 
-    else if (TextUtils.isEmpty(password)){
-        Toast.makeText(this, "Ingrese Contraseña", Toast.LENGTH_SHORT).show();
-    }
-    else {
-        LoginDeUsuario();
-    }
-
-    }
-
-    private void LoginDeUsuario() {
-        progressDialog.setMessage("Iniciando Sesión...");
+    private void iniciarSesion(String email, String password) {
+        progressDialog.setMessage("Iniciando sesión...");
         progressDialog.show();
-        firebaseAuth.signInWithEmailAndPassword(correo,password)
-                .addOnCompleteListener(Login.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()){
-                        progressDialog.dismiss();
-                        FirebaseUser user = firebaseAuth.getCurrentUser();
-                        startActivity(new Intent(Login.this,MenuPrincipal.class));
-                        Toast.makeText(Login.this, "Bienvenido(a):"+user.getEmail(), Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                    else {
-                        progressDialog.dismiss();
-                        Toast.makeText(Login.this, "Verifique si el correo o/y contraseña son válidos", Toast.LENGTH_SHORT).show();
-                    }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(Login.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+
+        authService.login(email, password, new AuthCallback() {
+            @Override
+            public void onSuccess(FirebaseUser user) {
+                progressDialog.dismiss();
+                startActivity(new Intent(Login.this, MenuPrincipal.class));
+                Toast.makeText(Login.this, "Bienvenido(a): " + user.getEmail(), Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onFailure(String message) {
+                progressDialog.dismiss();
+                Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-      onBackPressed();
+        onBackPressed();
         return super.onSupportNavigateUp();
+    }
+
+    // ================== COMPONENTES INTERNOS ==================
+
+    interface AuthService {
+        void login(String email, String password, AuthCallback callback);
+    }
+
+    interface AuthCallback {
+        void onSuccess(FirebaseUser user);
+        void onFailure(String message);
+    }
+
+    class FirebaseAuthService implements AuthService {
+        private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
+        @Override
+        public void login(String email, String password, final AuthCallback callback) {
+            firebaseAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(Login.this, task -> {
+                        if (task.isSuccessful()) {
+                            callback.onSuccess(firebaseAuth.getCurrentUser());
+                        } else {
+                            callback.onFailure("Correo o contraseña inválidos.");
+                        }
+                    })
+                    .addOnFailureListener(e -> callback.onFailure(e.getMessage()));
+        }
+    }
+
+    class LoginValidator {
+        public boolean isValidEmail(String email) {
+            return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+        }
+
+        public boolean isValidPassword(String password) {
+            return !TextUtils.isEmpty(password);
+        }
     }
 }
