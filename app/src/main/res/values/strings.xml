@@ -1,0 +1,116 @@
+<resources>
+    <string name="app_name">Proyecto_Agenda</string>
+
+
+    <!---Main Activity-->
+    <string name="Btn_Login">Login</string>
+    <string name="Btn_Registro">Registro</string>
+
+    <!---Actividad Registro-->
+    <string name="CrearCuentaTXT">Crear una cuenta</string>
+    <string name="NombreEt">Nombres</string>
+    <string name="CorreoEt">Correo electrónico</string>
+    <string name="ContraseñaEt">Contraseña</string>
+    <string name="ConfirmarContraseñaEt">Confirmar contraseña</string>
+    <string name="RegistrarUsuario">Registrar</string>
+    <string name="TengounacuentaTXT">Tengo una cuenta</string>
+
+
+    <!---Actividad Login-->
+    <string name="IniciarSesionTXT">Iniciar Sesión</string>
+    <string name="CorreoLogin">Correo</string>
+    <string name="PassLogin">Contraseña</string>
+    <string name="Btn_Logeo">Ingresar</string>
+    <string name="UsuarioNuevoTXT">¿No tienes una cuenta?. Registrate</string>
+
+    <!---Menú Principal-->
+    <string name="BienvenidoPrincipal">Bienvenido(a)</string>
+    <string name="UidPrincipal"> -- </string>
+    <string name="nombresPrincipal"> -- </string>
+    <string name="correoPrincipal"> -- </string>
+
+    <string name="AgregarNotas">Agregar</string>
+    <string name="ListarNotas">Mis Notas</string>
+    <string name="Importantes">Importantes</string>
+    <string name="Perfil">Perfil</string>
+    <string name="AcercaDe">Acerca De</string>
+    <string name="CerrarSesion">Salir</string>
+
+    <!---Agregar Nota-->
+    <string name="Uid_Usuario">Uid del usuario</string>
+    <string name="Correo_Usuario">Correo de Usuario</string>
+    <string name="Fecha_Hora_Actual">Fecha y hora actual</string>
+    <string name="Titulo"> Titulo</string>
+    <string name="Descripcion">Descripcion</string>
+    <string name="Btn_Calendario">Calendario</string>
+    <string name="Fecha">00/00/0000 </string>
+    <string name="Estado"> No finalizado</string>
+
+    <!---Menú-->
+    <string name="Agregar_Nota_BD">Agregar</string>
+    <string name="Actualizar_Nota_BD">Actualizar</string>
+
+    <!---Item nota-->
+    <string name="Id_nota_Item">Id nota</string>
+    <string name="Uid_Usuario_Item">Uid del usuario</string>
+    <string name="Correo_Usuario_Item">Correo de Usuario</string>
+    <string name="Fecha_Hora_Registro_Item">Fecha y hora actual</string>
+    <string name="Titulo_Item"> Titulo</string>
+    <string name="Descripcion_Item">Descripcion</string>
+    <string name="Btn_Calendario_Item">Calendario</string>
+    <string name="Fecha_Item">00/00/0000 </string>
+    <string name="Estado_Item"> No finalizado</string>
+
+    <!---Item nota importante-->
+    <string name="Id_nota_Item_I">Id nota</string>
+    <string name="Uid_Usuario_Item_I">Uid del usuario</string>
+    <string name="Correo_Usuario_Item_I">Correo de Usuario</string>
+    <string name="Fecha_Hora_Registro_Item_I">Fecha y hora actual</string>
+    <string name="Titulo_Item_I"> Titulo</string>
+    <string name="Descripcion_Item_I">Descripcion</string>
+    <string name="Btn_Calendario_Item_I">Calendario</string>
+    <string name="Fecha_Item_I">00/00/0000 </string>
+    <string name="Estado_Item_I"> No finalizado</string>
+
+    <!---Item nota-->
+    <string name="ElijaOpcionTXT">Elija una opción</string>
+    <string name="CD_Eliminar">Eliminar</string>
+    <string name="CD_Actualizar">Actualizar</string>
+
+    <!---Actualizar Nota-->
+    <string name="Id_nota_A">Id nota</string>
+    <string name="Uid_Usuario_A">Uid del usuario</string>
+    <string name="Correo_Usuario_A">Correo de Usuario</string>
+    <string name="Fecha_registro_A">Fecha de registro</string>
+    <string name="Titulo_A"> Titulo</string>
+    <string name="Descripcion_A">Descripcion</string>
+    <string name="Btn_Calendario_A">Calendario</string>
+    <string name="Fecha_A">00/00/0000 </string>
+    <string name="Estado_A"> No finalizado</string>
+    <string name="Estado_nuevo"> -- </string>
+
+    <!--SPINNER ESTADO -->
+    <string-array name="Estado_nota">
+        <item>"No finalizado"</item>
+        <item>Finalizado</item>
+    </string-array>
+
+    <!--DETALLE NOTA -->
+    <string name="Id_nota_Detalle_TXT">Id de la nota: </string>
+    <string name="Id_nota_Detalle">Id nota</string>
+    <string name="Uid_usuario_Detalle_TXT">Uid de usuario: </string>
+    <string name="Uid_usuario_Detalle">Uid usuario</string>
+    <string name="Correo_usuario_Detalle_TXT">Correo de usuario: </string>
+    <string name="Correo_usuario_Detalle">Correo usuario</string>
+    <string name="Titulo_Detalle_TXT">Titulo: </string>
+    <string name="Titulo_Detalle">Titulo</string>
+    <string name="Descripcion_Detalle_TXT">Descripcion: </string>
+    <string name="Descripcion_Detalle">Descripcion</string>
+    <string name="Fecha_Registro_Detalle_TXT">Fecha de Registro: </string>
+    <string name="Fecha_Registro_Detalle">Fecha Registro</string>
+    <string name="Fecha_Nota_Detalle_TXT">Fecha nota: </string>
+    <string name="Fecha_Nota_Detalle">Fecha nota</string>
+    <string name="Estado_Detalle_TXT">Estado de la nota: </string>
+    <string name="Estado_Detalle">Estado</string>
+    <string name="Boton_Importante">Importante</string>
+</resources>
