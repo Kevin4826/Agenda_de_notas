@@ -41,6 +41,8 @@ public class Notas_Importantes extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle("Notas Importantes");
+            actionBar.setDisplayHomeAsUpEnabled(true);  
+            actionBar.setDisplayShowHomeEnabled(true);
         }
 
         recyclerViewNotasImportantes = findViewById(R.id.RecyclerViewNotasImportantes);
@@ -99,6 +101,12 @@ public class Notas_Importantes extends AppCompatActivity {
         if (firebaseRecyclerAdapter != null) {
             firebaseRecyclerAdapter.stopListening();
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed(); 
+        return true;
     }
 
 }
