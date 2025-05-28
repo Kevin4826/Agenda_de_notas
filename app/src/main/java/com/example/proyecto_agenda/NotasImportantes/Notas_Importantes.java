@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -24,49 +23,57 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class Notas_Importantes extends AppCompatActivity {
 
-    RecyclerView recyclerViewNotasImportantes;
-    FirebaseDatabase firebaseDatabase;
-    DatabaseReference misNotasImportantes;
-    FirebaseAuth firebaseAuth;
-    FirebaseUser user;
-    FirebaseRecyclerAdapter<Nota, ViewHolder_Nota_Importante> firebaseRecyclerAdapter;
-    FirebaseRecyclerOptions<Nota> firebaseRecyclerOptions;
-    LinearLayoutManager linearLayoutManager;
+    private RecyclerView recyclerViewNotasImportantes;
+    private FirebaseRecyclerAdapter<Nota, ViewHolder_Nota_Importante> firebaseRecyclerAdapter;
+    private LinearLayoutManager linearLayoutManager;
+    private DatabaseReference misNotasImportantes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notas_archivadas);
 
+        setupActionBar();
+        initFirebaseReferences();
+        setupRecyclerView();
+        setupFirebaseAdapter();
+    }
+
+    private void setupActionBar() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle("Notas Importantes");
-            actionBar.setDisplayHomeAsUpEnabled(true);  
+            actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
-
-        recyclerViewNotasImportantes = findViewById(R.id.RecyclerViewNotasImportantes);
-        recyclerViewNotasImportantes.setHasFixedSize(true);
-
-        firebaseAuth = FirebaseAuth.getInstance();
-        user = firebaseAuth.getCurrentUser();
-
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        misNotasImportantes = firebaseDatabase.getReference("Notas_Importantes").child(user.getUid());
-
-        listarNotasImportantes();
     }
 
-    private void listarNotasImportantes() {
-        firebaseRecyclerOptions = new FirebaseRecyclerOptions.Builder<Nota>()
+    private void initFirebaseReferences() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            misNotasImportantes = FirebaseDatabase.getInstance()
+                    .getReference("Notas_Importantes")
+                    .child(user.getUid());
+        }
+    }
+
+    private void setupRecyclerView() {
+        recyclerViewNotasImportantes = findViewById(R.id.RecyclerViewNotasImportantes);
+        recyclerViewNotasImportantes.setHasFixedSize(true);
+        linearLayoutManager = new LinearLayoutManager(this);
+        recyclerViewNotasImportantes.setLayoutManager(linearLayoutManager);
+    }
+
+    private void setupFirebaseAdapter() {
+        FirebaseRecyclerOptions<Nota> options = new FirebaseRecyclerOptions.Builder<Nota>()
                 .setQuery(misNotasImportantes, Nota.class)
                 .build();
 
-        firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Nota, ViewHolder_Nota_Importante>(firebaseRecyclerOptions) {
+        firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Nota, ViewHolder_Nota_Importante>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull ViewHolder_Nota_Importante viewHolder, int position, @NonNull Nota nota) {
-                viewHolder.setItemData(getApplicationContext(),
-                        String.valueOf(nota.getId()), // Convertir el ID a String
+            protected void onBindViewHolder(@NonNull ViewHolder_Nota_Importante holder, int position, @NonNull Nota nota) {
+                holder.setItemData(getApplicationContext(),
+                        String.valueOf(nota.getId()),
                         nota.getUidUsuario(),
                         nota.getCorreoUsuario(),
                         nota.getFechaHoraActual(),
@@ -79,34 +86,34 @@ public class Notas_Importantes extends AppCompatActivity {
             @NonNull
             @Override
             public ViewHolder_Nota_Importante onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_nota_importante, parent, false);
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.item_nota_importante, parent, false);
                 return new ViewHolder_Nota_Importante(view);
             }
         };
 
-        linearLayoutManager = new LinearLayoutManager(this);
-        recyclerViewNotasImportantes.setLayoutManager(linearLayoutManager);
         recyclerViewNotasImportantes.setAdapter(firebaseRecyclerAdapter);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        firebaseRecyclerAdapter.startListening();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
         if (firebaseRecyclerAdapter != null) {
-            firebaseRecyclerAdapter.stopListening();
+            firebaseRecyclerAdapter.startListening();
         }
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed(); 
-        return true;
+    protected void onStop() {
+        if (firebaseRecyclerAdapter != null) {
+            firebaseRecyclerAdapter.stopListening();
+        }
+        super.onStop();
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 }
